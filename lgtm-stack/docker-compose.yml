@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  # --- Grafana + Loki + Tempo + Mimir (all-in-one) ---
+  lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: lgtm
+    environment:
+      - ENABLE_LOGS_GRAFANA=true
+      - GF_SERVER_HTTP_PORT=3000
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_AUTH_BASIC_ENABLED=true
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"    # Grafana UI
+      - "3100:3100"    # Loki API
+      - "4317:4317"    # OTLP gRPC
+      - "4318:4318"    # OTLP HTTP
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

@@ -1,0 +1,34 @@
+// Alloy Configuration - Standalone Log Collector
+// Sends logs to external Loki instance
+
+discovery.docker "host" {
+  host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "host_containers" {
+  targets = discovery.docker.host.targets
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    target_label  = "container"
+  }
+  rule {
+    source_labels = ["__meta_docker_container_image"]
+    target_label  = "image"
+  }
+  rule {
+    target_label = "source"
+    replacement  = "alloy-standalone"
+  }
+}
+
+loki.source.docker "host" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.host_containers.output
+  forward_to = [loki.write.loki.receiver]
+}
+
+loki.write "loki" {
+  endpoint {
+    url = env("LOKI_ENDPOINT")
+  }
+}

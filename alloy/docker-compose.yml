@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    user: "0:0"
+    command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"  # Alloy HTTP API
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    # Environment variables for Loki endpoint (can be overridden in .env)
+    environment:
+      - LOKI_ENDPOINT=${LOKI_ENDPOINT:-http://lgtm:3100/loki/api/v1/push}
