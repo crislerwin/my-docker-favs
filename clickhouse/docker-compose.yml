@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123"    # HTTP interface
+      - "9002:9000"    # Native protocol (mapped to avoid conflict)
+      - "9009:9009"    # Inter-server communication
+    environment:
+      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-default}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-password}
+      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
+    volumes:
+      - ./data:/var/lib/clickhouse
+
+  clickhouse-ui:
+    image: ghcr.io/caioriccioli/clickhouse-ui:latest
+    container_name: clickhouse-ui
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    environment:
+      - CLICKHOUSE_HOST=http://clickhouse:8123
+    depends_on:
+      - clickhouse
