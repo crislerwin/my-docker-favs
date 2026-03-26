@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  evolution-api:
+    image: atendai/evolution-api:latest
+    container_name: evolution-api
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_URL=${SERVER_URL:-http://localhost:8080}
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY:-your-super-secret-key}
+      - DATABASE_PROVIDER=${DATABASE_PROVIDER:-sqlite}
+      - DATABASE_CONNECTION_URI=${DATABASE_URI:-}
+      - CACHE_REDIS_ENABLED=${REDIS_ENABLED:-false}
+      - CACHE_REDIS_URI=${REDIS_URI:-}
+    volumes:
+      - ./data:/evolution/instances
