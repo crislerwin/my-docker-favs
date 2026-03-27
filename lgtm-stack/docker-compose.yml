@@ -7,16 +7,16 @@ services:
     container_name: lgtm
     environment:
       - ENABLE_LOGS_GRAFANA=true
-      - GF_SERVER_HTTP_PORT=3000
-      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_SERVER_HTTP_PORT=${GRAFANA_PORT:-3000}
+      - GF_AUTH_ANONYMOUS_ENABLED=${GRAFANA_ANONYMOUS_ENABLED:-false}
       - GF_AUTH_BASIC_ENABLED=true
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
     ports:
-      - "3000:3000"    # Grafana UI
-      - "3100:3100"    # Loki API
-      - "4317:4317"    # OTLP gRPC
-      - "4318:4318"    # OTLP HTTP
+      - "${GRAFANA_PORT:-3000}:${GRAFANA_PORT:-3000}"    # Grafana UI
+      - "${LOKI_PORT:-3100}:${LOKI_PORT:-3100}"    # Loki API
+      - "${OTLP_GRPC_PORT:-4317}:${OTLP_GRPC_PORT:-4317}"    # OTLP gRPC
+      - "${OTLP_HTTP_PORT:-4318}:${OTLP_HTTP_PORT:-4318}"    # OTLP HTTP
     volumes:
       - ./data:/data
     restart: unless-stopped
