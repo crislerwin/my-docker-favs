@@ -1,0 +1,60 @@
+version: "3.7"
+
+services:
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy-komodo
+    user: "0:0"
+    command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+    ports:
+      - "12346:12345" # Porta do Host (12346) : Porta do Container (12345)
+    volumes:
+      - /data/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    environment:
+      - LOKI_ENDPOINT=${LOKI_ENDPOINT:-http://lgtm:3100/loki/api/v1/push}
+    configs:
+      - source: alloy_config
+        target: /etc/alloy/config.alloy
+
+configs:
+  alloy_config:
+    content: |
+      // Alloy Configuration - Komodo Log Collector
+      // Sends logs to external Loki instance
+
+      discovery.docker "host" {
+        host = "unix:///var/run/docker.sock"
+      }
+
+      discovery.relabel "host_containers" {
+        targets = discovery.docker.host.targets
+        rule {
+          source_labels = ["__meta_docker_container_name"]
+          target_label  = "container"
+        }
+        rule {
+          source_labels = ["__meta_docker_container_image"]
+          target_label  = "image"
+        }
+        rule {
+          target_label = "server"
+          replacement  = "komodo"
+        }
+        rule {
+          target_label = "source"
+          replacement  = "komodo-alloy"
+        }
+      }
+
+      loki.source.docker "host" {
+        host       = "unix:///var/run/docker.sock"
+        targets    = discovery.relabel.host_containers.output
+        forward_to = [loki.write.loki.receiver]
+      }
+
+      loki.write "loki" {
+        endpoint {
+          url = sys.env("LOKI_ENDPOINT")
+        }
+      }
