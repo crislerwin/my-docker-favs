@@ -65,13 +65,14 @@ services:
     restart: unless-stopped
 
   # Optional: Mailhog for testing emails
-  mailhog:
-    image: mailhog/mailhog
-    container_name: helicone-mailhog
-    ports:
-      - "${MAILHOG_SMTP_PORT:-1025}:1025"
-      - "${MAILHOG_WEB_PORT:-8025}:8025"
-    restart: unless-stopped
+  # Uncomment if you need email testing
+  # mailhog:
+  #   image: mailhog/mailhog:latest
+  #   container_name: helicone-mailhog
+  #   ports:
+  #     - "${MAILHOG_SMTP_PORT:-1025}:1025"
+  #     - "${MAILHOG_WEB_PORT:-8025}:8025"
+  #   restart: unless-stopped
 
 volumes:
   postgres_data:
