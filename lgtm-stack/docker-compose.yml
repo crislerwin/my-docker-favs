@@ -12,6 +12,8 @@ services:
       - GF_AUTH_BASIC_ENABLED=true
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      # Install Business Charts plugin
+      - GF_INSTALL_PLUGINS=volkovlabs-business-charts
     ports:
       - "${GRAFANA_PORT:-3000}:${GRAFANA_PORT:-3000}"    # Grafana UI
       - "${LOKI_PORT:-3100}:${LOKI_PORT:-3100}"    # Loki API
