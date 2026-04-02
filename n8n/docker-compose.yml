@@ -66,8 +66,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    # Optional: if you want n8n to run as a specific user
-    # user: "1000:1000"
+    # Run as node user (UID 1000) to avoid permission issues
+    user: "1000:1000"
 
 volumes:
   postgres_data:
+
+# NOTE: Before first run, create the data directory with correct permissions:
+# mkdir -p data && sudo chown -R 1000:1000 data
