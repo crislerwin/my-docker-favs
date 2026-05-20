@@ -20,5 +20,18 @@ services:
       - "${OTLP_GRPC_PORT:-4317}:${OTLP_GRPC_PORT:-4317}"    # OTLP gRPC
       - "${OTLP_HTTP_PORT:-4318}:${OTLP_HTTP_PORT:-4318}"    # OTLP HTTP
     volumes:
-      - ./data:/data
+      - ./data/lgtm:/data
+    restart: unless-stopped
+
+  # --- Alloy Log Collector ---
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
+    user: "0:0"
+    command: run --server.http.listen-addr=0.0.0.0:12345 /etc/alloy/config.alloy
+    volumes:
+      - ./config/alloy.config:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - lgtm
     restart: unless-stopped
